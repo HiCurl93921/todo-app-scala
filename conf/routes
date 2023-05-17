@@ -4,7 +4,13 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                             controllers.HomeController.index
+GET     /                           controllers.HomeController.index
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+GET     /todos                      controllers.TodoController.all
+GET     /todos/:id                  controllers.TodoController.findById(id: Long)
+POST    /todos                      controllers.TodoController.create
+PUT     /todos/:id                  controllers.TodoController.update(id: Long)
+DELETE  /todos/:id                  controllers.TodoController.delete(id: Long)
