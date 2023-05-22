@@ -1,14 +1,9 @@
 package models
 
 import java.time.LocalDateTime
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-
+import Todo._
 import ixias.model._
 import ixias.util.EnumStatus
-
-import Todo._
 
 /**
  * Todoケースクラス
@@ -47,53 +42,28 @@ object Todo {
       state
     ).toWithNoId
 
-  def toJson(todo: Todo): JsValue = Json.toJson(todo)
+  sealed abstract class State (
+    val code: Short,
+    val name: String
+  ) extends EnumStatus
 
-//  implicit val idWriter: Writes[TodoId] = Writes[TodoId] { id => JsNumber(id.value) }
+  /**
+  Todo状態列挙型
+   */
+  object State extends EnumStatus.Of[State] {
 
-  implicit val idWriter: Writes[Id] = Writes[Id] { id => JsNumber(id) }
-  implicit val categoryIdWriter: Writes[TodoCategory.Id] = Writes[TodoCategory.Id] { id => JsNumber(id) }
+    case object NotYet extends State(0, "TODO(未着手)")
 
-  implicit val writer: Writes[Todo] = (
-      (JsPath \ "id").write[Option[Id]] and
-      (JsPath \ "categoryId").write[TodoCategory.Id] and
-      (JsPath \ "title").write[String] and
-      (JsPath \ "body").write[String] and
-      (JsPath \ "state").write[Short] and
-      (JsPath \ "createdAt").write[LocalDateTime] and
-      (JsPath \ "updatedAt").write[LocalDateTime]
-    ) (unlift(Todo.unapply)
-  )
-}
+    case object Ongoing extends State(1, "着手中")
 
-case class TodoInput (
-  title:  String,
-  body:   Option[String]
-)
+    case object Completed extends State(2, "完了")
 
-object TodoInput {
-  implicit val reads = (
-    (JsPath \ "title").read(minLength[String](1) keepAnd maxLength[String](256)) and
-      (JsPath \ "body").readNullable[String]
-    )(apply _)
-}
+    final val DEFAULT: State = NotYet
 
-/**
- * 更新用Todoケースクラス
- * @param title Todoタイトル
- * @param body Todoの内容
- */
-case class TodoUpdate (
-  title:  String,
-  body:   String
-)
+    override def apply(code: Short): State = State
+      .find(_.code == code)
+      .getOrElse(DEFAULT)
 
-/**
- * 更新用Todoコンパニオンオブジェクト
- */
-object TodoUpdate {
-  implicit val reads = (
-    (JsPath \ "title").read(minLength[String](1) keepAnd( maxLength[String](256))) and
-      (JsPath \ "body").read(minLength[String](0) keepAnd maxLength[String](256))
-  )(apply _)
+    def apply(todo: Todo): State = apply(todo.state)
+  }
 }
