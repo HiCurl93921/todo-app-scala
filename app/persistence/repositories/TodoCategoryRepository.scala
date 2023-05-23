@@ -15,9 +15,10 @@ case class TodoCategoryRepository[P <: JdbcProfile]()(implicit val driver: P)
 
     def get(id: Id): Future[Option[EntityEmbeddedId]] =
       RunDBAction(TodoCategoryTable, "slave") { query =>
-      query.filter(q => q.id === id)
-      .result.headOption
-    }
+        query.filter(q => q.id === id)
+          .result
+          .headOption
+      }
 
     def add (entity: EntityWithNoId): Future[Id] =
       RunDBAction(TodoCategoryTable) { slick =>
