@@ -3,12 +3,17 @@ package persistence.repositories
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
 import slick.jdbc.JdbcProfile
-import persistence.db.{ SlickResourceProvider, TodoTable }
-
+import persistence.db.SlickResourceProvider
 import models.Todo
-case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
-  extends SlickRepository [Todo.Id, Todo, P]
-  with SlickResourceProvider[P]
+
+trait TodoRepository[P <: JdbcProfile]
+  extends SlickRepository[Todo.Id, Todo, P]
+  with SlickResourceProvider[P] {
+  def get(): Future[Seq[EntityEmbeddedId]]
+}
+
+case class TodoRepositoryOnDataBase[P <: JdbcProfile]()(implicit val driver: P)
+  extends TodoRepository[P]
   {
     import api._
 

@@ -1,23 +1,16 @@
-/**
- *
- * init sql
- *
- */
-
 CREATE TABLE `to_do_category` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `slug` VARCHAR(64) CHARSET ascii NOT NULL,
-  `color` TINYINT UNSIGNED NOT NULL,
+  `color` VARCHAR(64) NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO to_do_category(name,slug,color) values('フロントエンド','front',1);
-INSERT INTO to_do_category(name,slug,color) values('バックエンド','back',2);
-INSERT INTO to_do_category(name,slug,color) values('インフラ','infra',3);
-
+INSERT INTO to_do_category(name,slug,color) values('フロントエンド','front',"#FF0000");
+INSERT INTO to_do_category(name,slug,color) values('バックエンド','back',"#0000FF");
+INSERT INTO to_do_category(name,slug,color) values('インフラ','infra',"#00FF00");
 
 CREATE TABLE `to_do` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
