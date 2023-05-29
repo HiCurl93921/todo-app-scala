@@ -1,14 +1,15 @@
-package models
+package models.todos
 
-import java.time.LocalDateTime
-import Todo._
 import ixias.model._
 import ixias.util.EnumStatus
-import play.api.data.Form
-import play.api.data.Forms._
+import models.todos.Todo._
+import models.categories.TodoCategory
+
+import java.time.LocalDateTime
 
 /**
  * Todoケースクラス
+ *
  * @param id Todo識別子
  * @param title Todoタイトル
  * @param body Todoの内容
@@ -83,85 +84,4 @@ object Todo {
 
     def display: Seq[(String, String)] = values map { state => (state.code.toString, state.name) }
   }
-}
-
-/**
- * 表示用Todoオブジェクト
- * @param id TodoID
- * @param title Todoタイトル
- * @param body Todo詳細
- * @param state Todo状態
- * @param category Todoカテゴリ
- */
-case class DisplayTodo (
-  id:       Todo.Id,
-  title:    String,
-  body:     String,
-  state:    Todo.State,
-  category: TodoCategory.EmbeddedId)
-
-object DisplayTodo {
-  def apply (todo: Todo.EmbeddedId, category: TodoCategory.EmbeddedId): DisplayTodo = {
-    val todoValue = todo.v
-    val state = Todo.State(todoValue)
-    new DisplayTodo(todo.id, todoValue.title, todoValue.body, state, category)
-  }
-}
-
-/**
- * 新規作成用のTodoオブジェクト
- * @param categoryId カテゴリID
- * @param title タイトル
- * @param body 詳細
- */
-case class CreatingTodo(
-  categoryId: Long,
-  title:      String,
-  body:       String
-) {
-  def to: Todo#WithNoId = Todo(
-    TodoCategory.Id(categoryId),
-    title,
-    body
-  )
-}
-
-object CreatingTodo {
-  val form: Form[CreatingTodo] = Form(
-    mapping(
-      "categoryId" -> longNumber,
-      "title" -> nonEmptyText,
-      "body" -> text
-    )(CreatingTodo.apply)(CreatingTodo.unapply)
-  )
-}
-
-case class EditingTodo(
-  categoryId: Long,
-  title:      String,
-  body:       String,
-  state:      Short
-) {
-  def to(id: Long): Todo#EmbeddedId = Todo(
-    Option(Todo.Id(id)),
-    TodoCategory.Id(categoryId),
-    title,
-    body,
-    state
-  ).toEmbeddedId
-}
-
-object EditingTodo {
-  val form: Form[EditingTodo] = Form(
-    mapping(
-      "categoryId" -> longNumber,
-      "title" -> nonEmptyText,
-      "body" -> text,
-      "state" -> shortNumber
-    )(EditingTodo.apply)(EditingTodo.unapply)
-  )
-
-  def form(todo: Todo#EmbeddedId): Form[EditingTodo] = form.fill(of(todo))
-
-  def of(todo: Todo#EmbeddedId): EditingTodo = EditingTodo(todo.v.categoryId, todo.v.title, todo.v.body, todo.v.state)
 }

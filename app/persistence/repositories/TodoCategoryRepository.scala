@@ -1,7 +1,7 @@
 package persistence.repositories
 
 import ixias.persistence.SlickRepository
-import models.TodoCategory
+import models.categories.TodoCategory
 import persistence.db.SlickResourceProvider
 import slick.jdbc.JdbcProfile
 

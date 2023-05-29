@@ -1,6 +1,8 @@
-@(creatingForm: Form[CreatingTodo], selectableCategories: SelectableCategories)(implicit request: RequestHeader, messagesProvider: MessagesProvider)
-
+@import models.categories.SelectableCategories
+@import models.todos._
 @import helper._
+
+@(creatingForm: Form[CreatingTodo], selectableCategories: SelectableCategories)(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @form(routes.HomeController.create){
 @CSRF.formField

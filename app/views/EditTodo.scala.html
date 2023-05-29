@@ -1,6 +1,8 @@
-@(vv: ViewValueCommon, targetId: Long, editing: Form[EditingTodo], selectableCategories: SelectableCategories)(implicit request: RequestHeader, messagesProvider: MessagesProvider)
-
+@import models.categories.SelectableCategories
+@import models.todos._
 @import helper._
+
+@(vv: ViewValueCommon, targetId: Long, editing: Form[EditingTodo], selectableCategories: SelectableCategories)(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @common.Default(vv){
   @form(routes.HomeController.update(targetId)){

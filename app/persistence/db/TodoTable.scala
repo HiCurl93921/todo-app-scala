@@ -1,7 +1,8 @@
 package persistence.db
 
 import ixias.persistence.model.{DataSourceName, Table}
-import models.{Todo, TodoCategory}
+import models.todos.Todo
+import models.categories.TodoCategory
 import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
@@ -19,7 +20,7 @@ case class TodoTable [P <: JdbcProfile]()(implicit val driver: P)
   lazy val query = new Query
 
   class Table(tag: Tag) extends BasicTable(tag, "to_do") {
-    import Todo._
+    import models.todos.Todo._
 
     def id = column[Todo.Id] ("id", O.UInt64, O.PrimaryKey, O.AutoInc)
     def categoryId = column[TodoCategory.Id]("category_id", O.UInt64)

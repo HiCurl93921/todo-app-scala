@@ -1,15 +1,11 @@
-/**
- *
- * to do sample project
- *
- */
-
 package controllers
 
 import javax.inject._
 import play.api.mvc._
-import models.{CreatingTodo, DisplayTodo, EditingTodo, SelectableCategories, Todo, TodoCategory, ViewValueHome}
 import play.api.data.Form
+import models.categories.{SelectableCategories, TodoCategory}
+import models.todos.{CreatingTodo, DisplayTodo, EditingTodo, Todo}
+import models.ViewValueHome
 import play.api.i18n.I18nSupport
 import play.twirl.api.HtmlFormat
 

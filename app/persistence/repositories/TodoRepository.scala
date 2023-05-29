@@ -4,7 +4,7 @@ import scala.concurrent.Future
 import ixias.persistence.SlickRepository
 import slick.jdbc.JdbcProfile
 import persistence.db.SlickResourceProvider
-import models.Todo
+import models.todos.Todo
 
 trait TodoRepository[P <: JdbcProfile]
   extends SlickRepository[Todo.Id, Todo, P]

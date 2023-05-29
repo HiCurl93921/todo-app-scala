@@ -1,7 +1,8 @@
-@(vv: ViewValueCommon, todos: Seq[DisplayTodo], selectableCategories: SelectableCategories, creating: Form[CreatingTodo])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
-
-@import models._
+@import models.categories.SelectableCategories
+@import models.todos._
 @import helper._
+
+@(vv: ViewValueCommon, todos: Seq[DisplayTodo], selectableCategories: SelectableCategories, creating: Form[CreatingTodo])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
 
 @common.Default(vv){
     <div style="margin-bottom: 10px">
