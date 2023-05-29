@@ -4,6 +4,8 @@ import ixias.model._
 import ixias.util.EnumStatus
 import models.todos.Todo._
 import models.categories.TodoCategory
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsNumber, JsPath, JsValue, Json, Writes}
 
 import java.time.LocalDateTime
 
@@ -36,6 +38,8 @@ object Todo {
   type WithNoId = Entity.WithNoId[Id, Todo]
   type EmbeddedId = Entity.EmbeddedId[Id, Todo]
 
+  implicit val idWriter: Writes[Todo.Id] = Writes[Todo.Id](id => JsNumber(id))
+
   def apply(categoryId: TodoCategory.Id, title: String, body: String): Todo#WithNoId =
     new Todo(
       id = None,
@@ -59,6 +63,10 @@ object Todo {
   Todo状態列挙型
    */
   object State extends EnumStatus.Of[State] {
+    implicit val stateWriter: Writes[Todo.State] = (
+      (JsPath \ "code").write[Short] and
+        (JsPath \ "name").write[String]
+    )(unlift(State.unapply))
 
     case object NotYet extends State(0, "TODO(未着手)")
     case object Ongoing extends State(1, "着手中")
@@ -81,6 +89,8 @@ object Todo {
      * @return Todoの状態
      */
     def apply(todo: Todo): State = apply(todo.state)
+
+    def unapply(state: State): Option[(Short, String)] = Some((state.code, state.name))
 
     def display: Seq[(String, String)] = values map { state => (state.code.toString, state.name) }
   }

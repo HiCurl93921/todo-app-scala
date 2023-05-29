@@ -1,11 +1,15 @@
 package models.todos
 
-import models.categories.ResponseCategoryOnTodo
-
+import models.categories.ResponseCategoryForTodo
+import play.api.libs.json.{Json, Writes}
 case class ResponseTodo (
   id:       Todo.Id,
-  category: ResponseCategoryOnTodo,
+  category: ResponseCategoryForTodo,
   title:    String,
   body:     String,
-  state:    Short
+  state:    Todo.State
 )
+
+object ResponseTodo {
+  implicit val todoWriter: Writes[ResponseTodo] = Json.writes[ResponseTodo]
+}

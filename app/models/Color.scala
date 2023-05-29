@@ -1,5 +1,8 @@
 package models
 
+import play.api.libs.json.{JsPath, JsString, Json, Writes}
+import play.api.libs.functional.syntax._
+
 import scala.util.matching.Regex
 
 trait Color {
@@ -15,6 +18,8 @@ object Color {
   private val hexPattern: Regex = "[0-9A-Za-z]{2}".r
   private final val ALPHA_DEFAULT = "FF"
   private final val DEFAULT = "00"
+
+  implicit val colorWriter: Writes[Color] = Writes[Color](color => JsString(color.code))
 
   def apply (r: String, g: String, b: String, a: String = ALPHA_DEFAULT): Color = new Color {
     override val A: Hex = Hex(a)
