@@ -3,10 +3,10 @@ package models
 import scala.util.matching.Regex
 
 trait Color {
-  val A: Hex
   val R: Hex
   val G: Hex
   val B: Hex
+  val A: Hex
   lazy val code: String = s"#${R.code}${G.code}${B.code}"
   lazy val withAlpha: String = s"#${A.code}${R.code}${G.code}${B.code}"
 }
@@ -16,29 +16,27 @@ object Color {
   private final val ALPHA_DEFAULT = "FF"
   private final val DEFAULT = "00"
 
-  def apply (a: String, r: String, g: String, b: String): Color = new Color {
+  def apply (r: String, g: String, b: String, a: String = ALPHA_DEFAULT): Color = new Color {
     override val A: Hex = Hex(a)
     override val R: Hex = Hex(r)
     override val G: Hex = Hex(g)
     override val B: Hex = Hex(b)
   }
 
-  def apply (r: String, g: String, b: String): Color = Color(ALPHA_DEFAULT, r, g, b)
-
-  def apply (a: String, rgb: String): Color = Color(a, rgb, rgb, rgb)
+  def apply (rgb: String, a: String): Color = Color(rgb, rgb, rgb, a)
 
   def apply(value: String): Color = hexPattern.findAllIn(value).toList match {
     case r::g::b::Nil => Color(r, g, b)
-    case a::r::g::b::_ => Color(a, r, g, b)
+    case a::r::g::b::_ => Color(r, g, b, a)
     case _ => WHITE
   }
 
   def colorType(colorType: Short): Color = if (colorType < 0 || types.length <= colorType) WHITE else types(colorType)
 
-  final val WHITE: Color = Color(ALPHA_DEFAULT, DEFAULT)
-  final val SILVER: Color = Color(ALPHA_DEFAULT, "C0")
-  final val GRAY: Color = Color(ALPHA_DEFAULT, "80")
-  final val BLACK: Color = Color(ALPHA_DEFAULT, "00")
+  final val WHITE: Color = Color(DEFAULT,ALPHA_DEFAULT)
+  final val SILVER: Color = Color("C0", ALPHA_DEFAULT)
+  final val GRAY: Color = Color("80", ALPHA_DEFAULT)
+  final val BLACK: Color = Color("00", ALPHA_DEFAULT)
   final val RED: Color = Color("FF0000")
   final val MAROON: Color = Color("800000")
   final val YELLOW: Color = Color("FFFF00")
