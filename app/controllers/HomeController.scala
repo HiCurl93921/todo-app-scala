@@ -8,8 +8,10 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import models.{CreatingTodo, DisplayTodo, SelectableCategories, Todo, TodoCategory, EditingTodo, ViewValueHome}
+import models.{CreatingTodo, DisplayTodo, EditingTodo, SelectableCategories, Todo, TodoCategory, ViewValueHome}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
+import play.twirl.api.HtmlFormat
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,11 +34,18 @@ class HomeController @Inject()(cc: ControllerComponents)
   private val categoryRepository = persistence.onMySql.TodoCategoryRepository.repository
 
   def index () = Action.async { implicit request =>
+    showIndex(creating)(Ok.apply)
+  }
+
+  private def showIndex (form: Form[CreatingTodo])(res: HtmlFormat.Appendable => Result)(implicit request: RequestHeader) = {
+    val todosRequest      = todoRepository.get()
+    val categoriesRequest = categoryRepository.get()
+
     for {
-      embeddedTodos <- todoRepository.get()
-      embeddedCategories <- categoryRepository.get()
+      embeddedTodos <- todosRequest
+      embeddedCategories <- categoriesRequest
     } yield {
-      Ok(views.html.Home(vv, createDisplayTodos(embeddedTodos, embeddedCategories),new SelectableCategories(embeddedCategories), creating))
+      res(views.html.Home(vv, createDisplayTodos(embeddedTodos, embeddedCategories), new SelectableCategories(embeddedCategories), form))
     }
   }
 
@@ -50,15 +59,10 @@ class HomeController @Inject()(cc: ControllerComponents)
   def create = Action.async { implicit request =>
     creating.bindFromRequest.fold(
       errors => {
-        for {
-          embeddedTodos <- todoRepository.get()
-          embeddedCategories <- categoryRepository.get()
-        } yield {
-          BadRequest(views.html.Home(vv, createDisplayTodos(embeddedTodos, embeddedCategories), new SelectableCategories(embeddedCategories), errors))
-        }
+        showIndex(errors)(BadRequest.apply)
       },
       success => {
-        createTodo(success) map { _ =>
+        todoRepository.add(success.to) map { _ =>
           Redirect(routes.HomeController.index())
         }
       }
@@ -66,9 +70,12 @@ class HomeController @Inject()(cc: ControllerComponents)
   }
 
   def edit(id: Long) = Action.async { implicit request =>
+    val todoRequest = todoRepository.get(Todo.Id(id))
+    val categoriesRequest = categoryRepository.get()
+
     for {
-      result <- todoRepository.get(Todo.Id(id))
-      categories <- categoryRepository.get()
+      result <- todoRequest
+      categories <- categoriesRequest
     } yield {
       Ok(views.html.EditTodo(vv.copy(title = "EDIT TODO"), id, EditingTodo.form(result.get), new SelectableCategories(categories)))
     }
@@ -77,15 +84,10 @@ class HomeController @Inject()(cc: ControllerComponents)
   def update(id: Long) = Action.async { implicit request =>
     editing.bindFromRequest.fold(
       errors => {
-        for {
-          embeddedTodos <- todoRepository.get()
-          embeddedCategories <- categoryRepository.get()
-        } yield {
-          BadRequest(views.html.Home(vv, createDisplayTodos(embeddedTodos, embeddedCategories), new SelectableCategories(embeddedCategories), creating))
-        }
+        showIndex(creating)(BadRequest.apply)
       },
       success => {
-        updateTodo(id, success) map { _ =>
+        todoRepository.update(success.to(id)) map { _ =>
           Redirect(routes.HomeController.index())
         }
       }
@@ -97,13 +99,4 @@ class HomeController @Inject()(cc: ControllerComponents)
       _ <- todoRepository.remove(Todo.Id(id))
     } yield { Redirect(routes.HomeController.index()) }
   }
-
-
-  private def createTodo(creatingTodo: CreatingTodo): Future[Seq[DisplayTodo]] = for {
-    _ <- todoRepository.add(creatingTodo.to)
-    todos <- todoRepository.get()
-    categories <- categoryRepository.get()
-  } yield { createDisplayTodos(todos, categories) }
-
-  private def updateTodo(id: Long, edited: EditingTodo): Future[Option[Todo#EmbeddedId]] = todoRepository.update(edited.to(id))
 }
