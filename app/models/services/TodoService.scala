@@ -19,4 +19,11 @@ class TodoService()(implicit executionContext: ExecutionContext) {
   } yield {
     f(reservedTodos, reservedCategories)
   }
+
+  def get[T](id: Long, f: (Todo.EmbeddedId, Option[TodoCategory.EmbeddedId]) => T): Future[Option[T]] = todoRepository.get(Todo.Id(id)) flatMap {
+    case None => Future.successful(None)
+    case Some(todo) => categoryRepository.get(todo.v.categoryId) map { category =>
+      Some(f(todo, category))
+    }
+  }
 }

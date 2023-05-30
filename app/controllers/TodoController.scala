@@ -4,7 +4,7 @@ import com.sun.net.httpserver.Authenticator.Success
 import models.categories.TodoCategory
 import models.services.TodoService
 import models.todos.{ResponseTodo, Todo}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsString, Json}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents}
 import play.api.mvc._
 
@@ -23,4 +23,10 @@ class TodoController @Inject()(cc: ControllerComponents)
     }
   }
 
+  def getById(id: Long): Action[AnyContent] = Action.async {
+    todoService.get(id, ResponseTodo.apply) map {
+      case None => Ok(JsString(""))
+      case Some(response) => Ok(Json.toJson(response))
+    }
+  }
 }

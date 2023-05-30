@@ -19,7 +19,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /todos                      controllers.TodoController.get
 
 # Get Todo by ID
-# GET   /todos/:id
+GET     /todos/:id                  controllers.TodoController.getById(id: Long)
 
 # Create New Todo
 # POST  /todos
