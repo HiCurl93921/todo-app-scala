@@ -68,6 +68,8 @@ object Todo {
         (JsPath \ "name").write[String]
     )(unlift(State.unapply))
 
+    case object Undefined extends State(-1, "未定義")
+
     case object NotYet extends State(0, "TODO(未着手)")
     case object Ongoing extends State(1, "着手中")
     case object Completed extends State(2, "完了")
@@ -81,7 +83,7 @@ object Todo {
      */
     override def apply(code: Short): State = State
       .find(_.code == code)
-      .getOrElse(DEFAULT)
+      .getOrElse(Undefined)
 
     /**
      * Todoオブジェクトの状態を検査します。
