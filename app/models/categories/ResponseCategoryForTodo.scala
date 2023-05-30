@@ -11,4 +11,10 @@ case class ResponseCategoryForTodo (
 
 object ResponseCategoryForTodo {
   implicit val categoryWriter: Writes[ResponseCategoryForTodo] = Json.writes[ResponseCategoryForTodo]
+
+  def apply(category: TodoCategory.EmbeddedId): ResponseCategoryForTodo = ResponseCategoryForTodo(
+    category.v.name,
+    category.v.slug,
+    category.v.color
+  )
 }
