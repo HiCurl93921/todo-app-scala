@@ -20,4 +20,13 @@ object ResponseTodo {
     todo.v.body,
     Todo.State(todo.v.state)
   )
+
+  def apply (todos: Seq[Todo.EmbeddedId], categories: Seq[TodoCategory.EmbeddedId]): Seq[ResponseTodo] = for {
+    todo <- todos
+    category <- categories.find {
+      _.id == todo.v.categoryId
+    }
+  } yield {
+    ResponseTodo(todo, category)
+  }
 }

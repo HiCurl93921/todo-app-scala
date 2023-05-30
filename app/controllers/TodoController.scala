@@ -19,6 +19,7 @@ class TodoController @Inject()(cc: ControllerComponents)
 
   def get(): Action[AnyContent] = Action.async {
     todoService.get(parseResponse) map { responses =>
+    todoService.get(ResponseTodo.apply) map { responses =>
       Ok(Json.toJson(responses))
     }
   }
