@@ -16,7 +16,7 @@ POST    /delete                     controllers.HomeController.delete(id: Long)
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # Get Todos
-# GET   /todos
+GET     /todos                      controllers.TodoController.get
 
 # Get Todo by ID
 # GET   /todos/:id
