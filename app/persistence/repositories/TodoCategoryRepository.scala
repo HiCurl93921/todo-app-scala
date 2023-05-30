@@ -1,15 +1,19 @@
 package persistence.repositories
 
 import ixias.persistence.SlickRepository
-import models.TodoCategory
+import models.categories.TodoCategory
 import persistence.db.SlickResourceProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 
-case class TodoCategoryRepository[P <: JdbcProfile]()(implicit val driver: P)
+trait TodoCategoryRepository[P <: JdbcProfile]
   extends SlickRepository[TodoCategory.Id, TodoCategory, P]
-  with SlickResourceProvider[P]
+  with SlickResourceProvider[P] {
+  def get(): Future[Seq[EntityEmbeddedId]]
+}
+case class TodoCategoryRepositoryOnDataBase[P <: JdbcProfile]()(implicit val driver: P)
+  extends TodoCategoryRepository[P]
   {
     import api._
 
@@ -18,6 +22,11 @@ case class TodoCategoryRepository[P <: JdbcProfile]()(implicit val driver: P)
         query.filter(q => q.id === id)
           .result
           .headOption
+      }
+
+    def get(): Future[Seq[EntityEmbeddedId]] =
+      RunDBAction(TodoCategoryTable, "slave") { query =>
+        query.result
       }
 
     def add (entity: EntityWithNoId): Future[Id] =

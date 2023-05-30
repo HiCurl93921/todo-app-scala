@@ -1,0 +1,17 @@
+@import models.categories.SelectableCategories
+@import models.todos._
+@import helper._
+
+@(creatingForm: Form[CreatingTodo], selectableCategories: SelectableCategories)(implicit request: RequestHeader, messagesProvider: MessagesProvider)
+
+@form(routes.HomeController.create){
+@CSRF.formField
+<table>
+    <tr>
+        <td>@inputText(creatingForm("title"), '_label -> "タイトル")</td>
+        <td>@inputText(creatingForm("body"), '_label -> "詳細")</td>
+        <td>@select(creatingForm("categoryId"), selectableCategories.display, '_label -> "カテゴリ")</td>
+        <td><button type="submit">追加</button></td>
+    </tr>
+</table>
+}

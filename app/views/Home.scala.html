@@ -1,13 +1,14 @@
-@*
- *
- * to do sample project
- *
- *@
+@import models.categories.SelectableCategories
+@import models.todos._
+@import helper._
 
-@(vv: models.ViewValueCommon)
+@(vv: ViewValueCommon, todos: Seq[DisplayTodo], selectableCategories: SelectableCategories, creating: Form[CreatingTodo])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
+
 @common.Default(vv){
-   <ul>
-<!--    <li><a>カテゴリー一覧</a></li>-->
-    <li><a>Todo一覧</a></li>
- </ul>
+    <div style="margin-bottom: 10px">
+    @TodoForm(creating, selectableCategories)
+    </div>
+    <div style="padding: 10px; margin-bottom: 10px; border:1px solid #333333">
+        @TodoList(todos)
+    </div>
 }

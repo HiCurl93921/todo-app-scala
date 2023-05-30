@@ -1,0 +1,35 @@
+@import models.todos._
+@import helper._
+@(todos: Seq[DisplayTodo])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
+
+<b>todo一覧</b>
+@if(!todos.isEmpty){
+<table>
+  <thead>
+  <tr>
+    <th>タイトル</th>
+    <th>詳細</th>
+    <th>状態</th>
+  </tr>
+  </thead>
+  <tbody>
+  @for(todo <- todos) {
+  <tr>
+    @form(routes.HomeController.edit(todo.id)){
+      @CSRF.formField
+      <td>@todo.title</td>
+    <td><pre>@todo.body</pre></td>
+      <td>@todo.state.name</td>
+      <td style="color: @(todo.category.v.color.code)">@todo.category.v.name</td>
+      <td><button name="id" value="@todo.id">変更</button></td>
+      <td>
+    }
+    @form(routes.HomeController.delete(todo.id)){
+    @CSRF.formField
+    <button name="id" value="@todo.id">削除</button></td>
+    }
+  </tr>
+  }
+  </tbody>
+</table>
+}
