@@ -3,6 +3,9 @@ package models.todos
 import models.categories.TodoCategory
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.libs.functional.syntax._
+import play.api.libs.json.JsPath
+import play.api.libs.json.Reads._
 
 
 /**
@@ -32,4 +35,10 @@ object CreatingTodo {
       "body" -> text
     )(CreatingTodo.apply)(CreatingTodo.unapply)
   )
+
+  implicit val creatingTodoReader = (
+    (JsPath \ "categoryId").read[Long] and
+      (JsPath \ "title").read[String](minLength[String](1) keepAnd maxLength[String](255)) and
+      (JsPath \ "body").read[String]
+  )(apply _)
 }

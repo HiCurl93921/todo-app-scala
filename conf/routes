@@ -22,7 +22,7 @@ GET     /todos                      controllers.TodoController.get
 GET     /todos/:id                  controllers.TodoController.getById(id: Long)
 
 # Create New Todo
-# POST  /todos
+POST    /todos                      controllers.TodoController.add
 
 # Update Todo by Id
 # PUT   /todos/:id

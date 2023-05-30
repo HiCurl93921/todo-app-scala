@@ -1,7 +1,7 @@
 package models.services
 
 import models.categories.TodoCategory
-import models.todos.{ResponseTodo, Todo}
+import models.todos.{CreatingTodo, ResponseTodo, Todo}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,4 +26,8 @@ class TodoService()(implicit executionContext: ExecutionContext) {
       Some(f(todo, category))
     }
   }
+
+  def add(todo: Todo.WithNoId): Future[Todo.Id] = todoRepository.add(todo)
+
+  def update()
 }
