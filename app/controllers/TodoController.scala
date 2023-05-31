@@ -1,9 +1,7 @@
 package controllers
 
-import com.sun.net.httpserver.Authenticator.Success
-import models.categories.TodoCategory
 import models.services.TodoService
-import models.todos.{CreatingTodo, ResponseTodo, Todo, UpdatingTodo}
+import models.todos.{CreatingTodo, Todo, UpdatingTodo}
 import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue, Json}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents}
 import play.api.mvc._
@@ -18,30 +16,30 @@ class TodoController @Inject()(cc: ControllerComponents)
   private val todoService: TodoService = new TodoService()
 
   def get(): Action[AnyContent] = Action.async {
-    todoService.get(ResponseTodo.apply) map { responses =>
+    todoService.get() map { responses =>
       Ok(Json.toJson(responses))
     }
   }
 
   def getById(id: Long): Action[AnyContent] = Action.async {
-    getByIdWithJson(id) map { Ok(_) }
+    getByIdWithJson(id)
   }
 
-  private def getByIdWithJson(id: Long): Future[JsValue] = todoService.get(id, ResponseTodo.apply) map {
-    case None => JsString("")
-    case Some(response) => Json.toJson(response)
+  private def getByIdWithJson(id: Long): Future[Result] = todoService.get(Todo.Id(id)) map {
+    case None => NotFound(JsString(""))
+    case Some(response) => Ok(Json.toJson(response))
   }
 
   def add(): Action[JsValue] = Action(parse.json).async { request: Request[JsValue] =>
     request.body.validate[CreatingTodo] match {
-      case JsSuccess(input, _) => todoService.add(input.to) flatMap { getByIdWithJson(_) map { Ok(_) } }
+      case JsSuccess(input, _) => todoService.add(input.to) flatMap { getByIdWithJson(_) }
       case JsError(errors) => Future.successful(BadRequest(JsError.toJson(errors)))
     }
   }
 
   def update(id: Long): Action[JsValue] = Action(parse.json).async { request: Request[JsValue] =>
     request.body.validate[UpdatingTodo] match {
-      case JsSuccess(input, _) => todoService.update(input.to(id), ResponseTodo.apply) map {
+      case JsSuccess(input, _) => todoService.update(input.to(id)) map {
         case None => BadRequest(Json.toJson(""))
         case Some(response) => Ok(Json.toJson(response))
       }

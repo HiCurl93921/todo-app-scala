@@ -1,16 +1,14 @@
 package models.services
 
-import models.categories.TodoCategory
-import models.todos.{CreatingTodo, ResponseTodo, Todo}
+import models.todos.{ResponseTodo, Todo}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 
 class TodoService()(implicit executionContext: ExecutionContext) {
   private val todoRepository = persistence.onMySql.TodoRepository.repository
   private val categoryRepository = persistence.onMySql.TodoCategoryRepository.repository
 
-  def get[T](f: (Seq[Todo.EmbeddedId], Seq[TodoCategory.EmbeddedId]) => Seq[T]): Future[Seq[T]] = for {
+  def get(): Future[Seq[ResponseTodo]] = for {
     reservedTodos <- todoRepository.get()
     reservedCategories <- categoryRepository.get {
       reservedTodos.map {
@@ -18,25 +16,25 @@ class TodoService()(implicit executionContext: ExecutionContext) {
       }.distinct
     }
   } yield {
-    f(reservedTodos, reservedCategories)
+    ResponseTodo(reservedTodos, reservedCategories)
   }
 
-  def get[T](id: Long, f: (Todo.EmbeddedId, Option[TodoCategory.EmbeddedId]) => T): Future[Option[T]] = todoRepository.get(Todo.Id(id)) flatMap {
-    joinCategory(_, f)
+  def get(id: Todo.Id): Future[Option[ResponseTodo]] = todoRepository.get(id) flatMap {
+    joinCategory
   }
 
-  private def joinCategory[T](todo: Option[Todo.EmbeddedId], f: (Todo.EmbeddedId, Option[TodoCategory.EmbeddedId]) => T): Future[Option[T]] = todo match {
+  private def joinCategory(todo: Option[Todo.EmbeddedId]): Future[Option[ResponseTodo]] = todo match {
     case None => Future.successful(None)
     case Some(todo) => categoryRepository.get(todo.v.categoryId) map { category =>
-      Some(f(todo, category))
+      Some(ResponseTodo(todo, category))
     }
   }
 
   def add(todo: Todo.WithNoId): Future[Todo.Id] = todoRepository.add(todo)
 
-  def update[T](updating: Todo.EmbeddedId, f: (Todo.EmbeddedId, Option[TodoCategory.EmbeddedId]) => T): Future[Option[T]] = todoRepository.update(updating) flatMap {
+  def update(updating: Todo.EmbeddedId): Future[Option[ResponseTodo]] = todoRepository.update(updating) flatMap {
     case None => Future.successful(None)
-    case Some(old) => get(old.id, f)
+    case Some(old) => get(old.id)
   }
 
   def delete(id: Todo.Id): Future[Option[Todo.EmbeddedId]] = todoRepository.remove(id)
