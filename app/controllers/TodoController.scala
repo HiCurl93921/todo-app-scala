@@ -48,4 +48,11 @@ class TodoController @Inject()(cc: ControllerComponents)
       case JsError(errors) => Future.successful(BadRequest(JsError.toJson(errors)))
     }
   }
+
+  def delete(id: Long): Action[AnyContent] = Action.async {
+    todoService.delete(Todo.Id(id)) map {
+      case None => BadRequest(Json.toJson(0))
+      case Some(old) => Ok(Json.toJson(old.id))
+    }
+  }
 }

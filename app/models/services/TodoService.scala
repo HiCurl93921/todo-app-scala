@@ -4,6 +4,7 @@ import models.categories.TodoCategory
 import models.todos.{CreatingTodo, ResponseTodo, Todo}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 class TodoService()(implicit executionContext: ExecutionContext) {
   private val todoRepository = persistence.onMySql.TodoRepository.repository
@@ -37,4 +38,6 @@ class TodoService()(implicit executionContext: ExecutionContext) {
     case None => Future.successful(None)
     case Some(old) => get(old.id, f)
   }
+
+  def delete(id: Todo.Id): Future[Option[Todo.EmbeddedId]] = todoRepository.remove(id)
 }
