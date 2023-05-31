@@ -3,8 +3,8 @@ package controllers
 import com.sun.net.httpserver.Authenticator.Success
 import models.categories.TodoCategory
 import models.services.TodoService
-import models.todos.{CreatingTodo, ResponseTodo, Todo}
-import play.api.libs.json.{JsString, JsValue, Json, JsSuccess, JsError}
+import models.todos.{CreatingTodo, ResponseTodo, Todo, UpdatingTodo}
+import play.api.libs.json.{JsError, JsString, JsSuccess, JsValue, Json}
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents}
 import play.api.mvc._
 
@@ -35,6 +35,16 @@ class TodoController @Inject()(cc: ControllerComponents)
   def add(): Action[JsValue] = Action(parse.json).async { request: Request[JsValue] =>
     request.body.validate[CreatingTodo] match {
       case JsSuccess(input, _) => todoService.add(input.to) flatMap { getByIdWithJson(_) map { Ok(_) } }
+      case JsError(errors) => Future.successful(BadRequest(JsError.toJson(errors)))
+    }
+  }
+
+  def update(id: Long): Action[JsValue] = Action(parse.json).async { request: Request[JsValue] =>
+    request.body.validate[UpdatingTodo] match {
+      case JsSuccess(input, _) => todoService.update(input.to(id), ResponseTodo.apply) map {
+        case None => BadRequest(Json.toJson(""))
+        case Some(response) => Ok(Json.toJson(response))
+      }
       case JsError(errors) => Future.successful(BadRequest(JsError.toJson(errors)))
     }
   }

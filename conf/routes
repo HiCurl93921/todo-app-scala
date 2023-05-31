@@ -25,7 +25,7 @@ GET     /todos/:id                  controllers.TodoController.getById(id: Long)
 POST    /todos                      controllers.TodoController.add
 
 # Update Todo by Id
-# PUT   /todos/:id
+PUT     /todos/:id                  controllers.TodoController.update(id: Long)
 
 # Delete Todo by Id
 # DELETE /todos/:id
