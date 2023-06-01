@@ -19,4 +19,8 @@ object ResponseCategory {
     category.v.slug,
     category.v.color
   )
+
+  def apply(categories: Seq[TodoCategory.EmbeddedId]): Seq[ResponseCategory] = categories map {
+    ResponseCategory(_)
+  }
 }

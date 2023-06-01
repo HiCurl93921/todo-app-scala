@@ -29,3 +29,6 @@ PUT     /todos/:id                  controllers.TodoController.update(id: Long)
 
 # Delete Todo by Id
 DELETE  /todos/:id                  controllers.TodoController.delete(id: Long)
+
+# Get Categories
+GET     /categories                 controllers.CategoryController.get
