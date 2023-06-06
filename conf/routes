@@ -14,3 +14,21 @@ POST    /delete                     controllers.HomeController.delete(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+# Get Todos
+GET     /todos                      controllers.TodoController.get
+
+# Get Todo by ID
+GET     /todos/:id                  controllers.TodoController.getById(id: Long)
+
+# Create New Todo
+POST    /todos                      controllers.TodoController.add
+
+# Update Todo by Id
+PUT     /todos/:id                  controllers.TodoController.update(id: Long)
+
+# Delete Todo by Id
+DELETE  /todos/:id                  controllers.TodoController.delete(id: Long)
+
+# Get Categories
+GET     /categories                 controllers.CategoryController.get

@@ -11,3 +11,4 @@ docker/db/data/
 .bloop
 .vscode
 *metals.sbt
+requests
